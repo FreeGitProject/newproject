@@ -9,7 +9,7 @@ A simple .NET Core Web API for managing tasks with JWT authentication.
 - JWT authentication with role-based authorization
 
 ## Prerequisites
-- .NET 7 SDK
+- .NET 9 SDK
 - SQL Server Express (or Docker for containerized SQL Server)
 - (Optional) Docker for containerization
 
