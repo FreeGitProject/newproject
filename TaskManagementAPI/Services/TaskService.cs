@@ -57,23 +57,36 @@ namespace TaskManagementAPI.Services
         }
         public async Task<ApiResponse<TaskCommentResponseDto>> AddCommentToTask(CreateCommentDto createCommentDto)
         {
-           
-                var comment = _mapper.Map<TaskComment>(createCommentDto);
-                comment.CreatedDate = DateTime.UtcNow;
-
-                await _dbContext.TaskComments.AddAsync(comment);
-                await _dbContext.SaveChangesAsync();
-
-                var savedComment = await _dbContext.TaskComments
-                    .Include(c => c.User)
-                    .FirstOrDefaultAsync(c => c.Id == comment.Id);
-
-                var result = _mapper.Map<TaskCommentResponseDto>(savedComment);
+            var task = await _dbContext.Tasks.FirstOrDefaultAsync(t => t.Id == createCommentDto.TaskId);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(t => t.Id == createCommentDto.UserId);
+            
+            if(task == null || user == null)
+            {
                 return new ApiResponse<TaskCommentResponseDto>
                 {
-                    Success = true,
-                    Data = result
+                    Success = false,
+                    Message = "error",//"task or user not found",
+                    Data = null
                 };
+
+            }
+           
+            var comment = _mapper.Map<TaskComment>(createCommentDto);
+            comment.CreatedDate = DateTime.UtcNow;
+
+            await _dbContext.TaskComments.AddAsync(comment);
+            await _dbContext.SaveChangesAsync();
+
+            var savedComment = await _dbContext.TaskComments
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(c => c.Id == comment.Id);
+
+            var result = _mapper.Map<TaskCommentResponseDto>(savedComment);
+            return new ApiResponse<TaskCommentResponseDto>
+            {
+                Success = true,
+                Data = result
+            };
          
         }
 
