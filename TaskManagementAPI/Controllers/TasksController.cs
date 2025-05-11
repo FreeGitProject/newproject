@@ -87,5 +87,14 @@ namespace TaskManagementAPI.Controllers
             new { taskId = createCommentDto.TaskId }, 
             response);
         }
+        [HttpGet]
+        [Authorize(Roles = "Admin")] // Only users with Admin role can access
+        public async Task<ActionResult<ApiResponse<List<TaskResponseDto>>>> GetAllTasks()
+        {
+
+            var response = await _taskService.GetAllTasks();
+            return Ok(response);
+
+        }
     }
 }

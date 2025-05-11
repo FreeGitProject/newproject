@@ -32,11 +32,6 @@ namespace TaskManagementAPI.Services
             return new ApiResponse<TaskResponseDto> { Data = result, Success = true };
         }
 
-        public async Task<List<Models.Task>> GetAllTasks()
-        {
-            return await _dbContext.Tasks.ToListAsync();
-        }
-
         public async Task<ApiResponse<TaskResponseDto>> CreateTask(CreateTaskDto createTaskDto)
         {
             var task = _mapper.Map<Models.Task>(createTaskDto);
@@ -103,6 +98,24 @@ namespace TaskManagementAPI.Services
                 Success = true,
                 Data = result
             };
+        }
+        public async Task<ApiResponse<List<TaskResponseDto>>> GetAllTasks()
+        {
+            
+                var tasks = await _dbContext.Tasks
+                    .Include(t => t.User)
+                    .Include(t => t.Comments)
+                    .ThenInclude(c => c.User)
+                    .ToListAsync();
+
+                var result = _mapper.Map<List<TaskResponseDto>>(tasks);
+                return new ApiResponse<List<TaskResponseDto>>
+                {
+                    Success = true,
+                    Data = result
+                };
+            
+            
         }
     }
 }

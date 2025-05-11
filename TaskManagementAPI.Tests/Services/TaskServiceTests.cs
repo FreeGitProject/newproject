@@ -1,9 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Security.Claims;
+using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Data;
 using TaskManagementAPI.DTOs.Request;
+using TaskManagementAPI.DTOs.Response;
 using TaskManagementAPI.Mappings;
 using TaskManagementAPI.Models;
 using TaskManagementAPI.Services;
@@ -279,6 +284,58 @@ namespace TaskManagementAPI.Tests.Services
             Assert.False(result.Success);
             Assert.Null(result.Data);
             Assert.Contains("error", result.Message.ToLower());
+        }
+        [Fact]
+        public async System.Threading.Tasks.Task GetAllTasks_ReturnsAllTasks_ForAdminUser()
+        {
+            // Arrange - Create test user with admin role
+            var adminUser = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.Name, "admin"),
+                new Claim(ClaimTypes.Role, "Admin")
+            }, "TestAuthentication"));
+
+            var controller = new TasksController(_taskService)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext { User = adminUser }
+                }
+            };
+
+            // Act
+            var result = await controller.GetAllTasks();
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var response = Assert.IsType<ApiResponse<List<TaskResponseDto>>>(okResult.Value);
+            Assert.True(response.Success);
+            Assert.Equal(3, response.Data.Count); // Assuming 3 tasks in seed data
+        }
+
+        [Fact]
+        public async System.Threading.Tasks.Task GetAllTasks_ReturnsForbidden_ForNonAdminUser()
+        {
+            // Arrange - Create test user with regular user role
+            var regularUser = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.Name, "user1"),
+                new Claim(ClaimTypes.Role, "User")
+            }, "TestAuthentication"));
+
+            var controller = new TasksController(_taskService)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext { User = regularUser }
+                }
+            };
+
+            // Act
+            var result = await controller.GetAllTasks();
+
+            // Assert
+            Assert.IsType<ForbidResult>(result);
         }
     }
 }
