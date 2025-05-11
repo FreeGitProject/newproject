@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
 
 // 1. Add Controllers
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<ITaskService, TaskService>();
 // 2. Add Swagger
 builder.Services.AddEndpointsApiExplorer();

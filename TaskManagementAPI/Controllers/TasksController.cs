@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskManagementAPI.DTOs.Request;
+using TaskManagementAPI.DTOs.Response;
 using TaskManagementAPI.Services;
 
 namespace TaskManagementAPI.Controllers
@@ -17,30 +20,35 @@ namespace TaskManagementAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTask([FromBody] Models.Task task)
+        public async Task<ActionResult<ApiResponse<TaskResponseDto>>> CreateTask([FromBody] CreateTaskDto createTaskDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var response = await _taskService.CreateTask(createTaskDto);
 
-            var createdTask = await _taskService.CreateTask(task);
-            return CreatedAtAction(nameof(GetTask), new { id = createdTask.Id }, createdTask);
+            if (!response.Success)
+                return BadRequest(response);
+
+            return CreatedAtAction(nameof(GetTask), new { id = response.Data.Id }, response);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTask(int id)
+        public async Task<ActionResult<ApiResponse<TaskResponseDto>>> GetTask(int id)
         {
-            var task = await _taskService.GetTask(id);
-            if (task == null)
-                return NotFound();
+            var response = await _taskService.GetTask(id);
 
-            return Ok(task);
+            if (!response.Success)
+                return NotFound(response);
+
+            return Ok(response);
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetTasksByUser(int userId)
+        public async  Task<ActionResult<ApiResponse<List<TaskResponseDto>>>> GetTasksByUser(int userId)
         {
-            var tasks = await _taskService.GetTasksByUser(userId);
-            return Ok(tasks);
+            var response = await _taskService.GetTasksByUser(userId);
+            if (!response.Success)
+                return NotFound(response);
+
+            return Ok(response);
         }
     }
 }
