@@ -9,5 +9,7 @@ namespace TaskManagementAPI.Services
         Task<List<Models.Task>> GetAllTasks();
         Task<ApiResponse<TaskResponseDto>> CreateTask(CreateTaskDto task);
         Task<ApiResponse<List<TaskResponseDto>>> GetTasksByUser(int userId);
+        Task<ApiResponse<List<TaskCommentResponseDto>>> GetTaskComments(int taskId);
+        Task<ApiResponse<TaskCommentResponseDto>> AddCommentToTask(CreateCommentDto createCommentDto);
     }
 }

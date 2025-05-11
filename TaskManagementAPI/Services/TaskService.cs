@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskManagementAPI.Data;
 using TaskManagementAPI.DTOs.Request;
 using TaskManagementAPI.DTOs.Response;
+using TaskManagementAPI.Models;
 
 namespace TaskManagementAPI.Services
 {
@@ -53,6 +54,42 @@ namespace TaskManagementAPI.Services
                 .ToListAsync();
             var result = _mapper.Map<List<TaskResponseDto>>(taskLst);
             return new ApiResponse<List<TaskResponseDto>> { Data = result, Success = true };
+        }
+        public async Task<ApiResponse<TaskCommentResponseDto>> AddCommentToTask(CreateCommentDto createCommentDto)
+        {
+           
+                var comment = _mapper.Map<TaskComment>(createCommentDto);
+                comment.CreatedDate = DateTime.UtcNow;
+
+                await _dbContext.TaskComments.AddAsync(comment);
+                await _dbContext.SaveChangesAsync();
+
+                var savedComment = await _dbContext.TaskComments
+                    .Include(c => c.User)
+                    .FirstOrDefaultAsync(c => c.Id == comment.Id);
+
+                var result = _mapper.Map<TaskCommentResponseDto>(savedComment);
+                return new ApiResponse<TaskCommentResponseDto>
+                {
+                    Success = true,
+                    Data = result
+                };
+         
+        }
+
+        public async Task<ApiResponse<List<TaskCommentResponseDto>>> GetTaskComments(int taskId)
+        {
+            var comments = await _dbContext.TaskComments
+                     .Include(c => c.User)
+                     .Where(c => c.TaskId == taskId)
+                     .ToListAsync();
+
+            var result = _mapper.Map<List<TaskCommentResponseDto>>(comments);
+            return new ApiResponse<List<TaskCommentResponseDto>>
+            {
+                Success = true,
+                Data = result
+            };
         }
     }
 }

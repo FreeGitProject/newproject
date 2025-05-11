@@ -10,6 +10,9 @@ namespace TaskManagementAPI.DTOs.Request
 
         [Required]
         [Range(1, int.MaxValue)]
-        public int TaskId { get; set; }
+        public int TaskId { get; set; }    
+        [Required]
+        [Range(1, int.MaxValue)]
+        public int UserId { get; set; }
     }
 }

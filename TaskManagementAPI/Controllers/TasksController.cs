@@ -50,5 +50,42 @@ namespace TaskManagementAPI.Controllers
 
             return Ok(response);
         }
+        [HttpGet("{taskId}/comments")]
+        public async Task<ActionResult<ApiResponse<List<TaskCommentResponseDto>>>> GetTaskComments(int taskId)
+        {
+           
+                if (taskId <= 0)
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Invalid task ID"
+                    });
+                }
+
+                var response = await _taskService.GetTaskComments(taskId);
+
+                if (!response.Success)
+                {
+                    return NotFound(response);
+                }
+
+                return Ok(response);
+            
+            
+        }
+        [HttpPost("comments")]
+        public async Task<ActionResult<ApiResponse<TaskCommentResponseDto>>> AddCommentToTask([FromBody] CreateCommentDto createCommentDto)
+        {
+            var response = await _taskService.AddCommentToTask(createCommentDto);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return CreatedAtAction(
+            nameof(GetTaskComments), 
+            new { taskId = createCommentDto.TaskId }, 
+            response);
+        }
     }
 }

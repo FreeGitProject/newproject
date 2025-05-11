@@ -28,9 +28,10 @@ namespace TaskManagementAPI.Mappings
 
             CreateMap<TaskComment, CommentResponseDto>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Username));
-
+            CreateMap<TaskComment, TaskCommentResponseDto>()
+    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Username));
             // User mappings
-         //   CreateMap<User, UserResponseDto>();
+            //   CreateMap<User, UserResponseDto>();
         }
     }
 }
