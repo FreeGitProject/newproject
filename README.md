@@ -21,7 +21,7 @@ A simple .NET Core Web API for managing tasks with JWT authentication.
    dotnet ef database update
 
 
-## 8. ER Diagram
+##  ER Diagram
 
 ER diagram using dbdiagram.io:
 
@@ -51,7 +51,7 @@ user_id int [ref: > users.id]
 }
 
    
-## 9. Sample SQL Queries
+## Sample SQL Queries
 
 ```sql
 -- Get all tasks assigned to a user
