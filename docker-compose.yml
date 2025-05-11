@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  taskmanagementapi:
+    build:
+      context: .
+      dockerfile: TaskManagementAPI/Dockerfile
+    ports:
+      - "8001:8080"
+    depends_on:
+      - sqlserver
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Server=sqlserver;Database=TaskDb;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True
+    networks:
+      - app-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "8002:1433"
+    environment:
+      SA_PASSWORD: StrongP@ssw0rd!
+      ACCEPT_EULA: "Y"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
