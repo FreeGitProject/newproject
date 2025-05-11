@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TaskManagementAPI.Data;
+using TaskManagementAPI.DTOs.Request;
 using TaskManagementAPI.Models;
 
 namespace TaskManagementAPI.Controllers
@@ -23,7 +24,7 @@ namespace TaskManagementAPI.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel model)
+        public IActionResult Login([FromBody] LoginRequestDto model)
         {
             // In a real app, verify hashed password
             var user = _context.Users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
@@ -58,12 +59,4 @@ namespace TaskManagementAPI.Controllers
         }
     }
 
-    public class LoginModel
-    {
-        [Required]
-        public string Username { get; set; }
-
-        [Required]
-        public string Password { get; set; }
-    }
 }

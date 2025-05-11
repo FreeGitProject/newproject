@@ -1,10 +1,13 @@
-﻿namespace TaskManagementAPI.Services
+﻿using TaskManagementAPI.DTOs.Request;
+using TaskManagementAPI.DTOs.Response;
+
+namespace TaskManagementAPI.Services
 {
     public interface ITaskService
     {
-        Task<Models.Task> GetTask(int id);
+        Task<ApiResponse<TaskResponseDto>> GetTask(int id);
         Task<List<Models.Task>> GetAllTasks();
-        Task<Models.Task> CreateTask(Models.Task task);
-        Task<List<Models.Task>> GetTasksByUser(int userId);
+        Task<ApiResponse<TaskResponseDto>> CreateTask(CreateTaskDto task);
+        Task<ApiResponse<List<TaskResponseDto>>> GetTasksByUser(int userId);
     }
 }
