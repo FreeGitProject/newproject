@@ -1,0 +1,111 @@
+﻿@using TaskManagementAPI.DTOs.Response
+@model TaskResponseDto
+
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4>Task Details</h4>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Title</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+
+            <dt class="col-sm-3">Assigned To</dt>
+            <dd class="col-sm-9">@Model.UserName</dd>
+
+            <dt class="col-sm-3">Created Date</dt>
+            <dd class="col-sm-9">@Model.CreatedDate.ToString("MM/dd/yyyy")</dd>
+
+            <dt class="col-sm-3">Due Date</dt>
+            <dd class="col-sm-9">@(Model.DueDate?.ToString("MM/dd/yyyy") ?? "No due date")</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+                <span class="badge @(Model.IsCompleted ? "bg-success" : "bg-warning")">
+                    @(Model.IsCompleted ? "Completed" : "Pending")
+                </span>
+            </dd>
+        </dl>
+
+        <hr />
+
+        <h5>Comments</h5>
+        <div id="commentsContainer">
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="card-title">@comment.UserName</h6>
+                            <small class="text-muted">@comment.CreatedDate.ToString("g")</small>
+                        </div>
+                        <p class="card-text">@comment.Content</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <form id="addCommentForm">
+            <input type="hidden" name="TaskId" value="@Model.Id" />
+            <div class="mb-3">
+                <label for="commentContent" class="form-label">Add Comment</label>
+                <textarea class="form-control" id="commentContent" name="Content" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#addCommentForm').submit(function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: '/api/tasks/comments',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        content: $('#commentContent').val(),
+                        taskId: @Model.Id
+                    }),
+                    success: function(response) {
+                        // Add new comment to the list
+                        const comment = response.data;
+                        const commentHtml = `
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="card-title">${comment.userName}</h6>
+                                        <small class="text-muted">${new Date(comment.createdDate).toLocaleString()}</small>
+                                    </div>
+                                    <p class="card-text">${comment.content}</p>
+                                </div>
+                            </div>`;
+                        $('#commentsContainer').prepend(commentHtml);
+                        $('#commentContent').val('');
+                    },
+                    error: function(xhr) {
+                        alert('Error adding comment: ' + xhr.responseJSON.message);
+                    }
+                });
+            });
+        });
+    </script>
+}

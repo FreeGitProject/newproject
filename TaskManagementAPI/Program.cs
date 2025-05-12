@@ -20,6 +20,8 @@ builder.Services.AddCors(options =>
 });
 
 // 1. Add Controllers
+builder.Services.AddControllersWithViews();
+
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<ITaskService, TaskService>();
@@ -80,6 +82,9 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseStaticFiles();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 app.MapControllers();
-
 app.Run();
