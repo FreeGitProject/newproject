@@ -49,6 +49,7 @@ created_date datetime
 task_id int [ref: > tasks.id]
 user_id int [ref: > users.id]
 }
+![TaskManagementER](https://github.com/user-attachments/assets/e19cda61-74c5-41f9-9e4a-ae12c593c052)
 
    
 ## Sample SQL Queries
