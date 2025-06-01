@@ -115,7 +115,32 @@ namespace TaskManagementAPI.Services
                     Data = result
                 };
             
-            
+        }
+
+        public async Task<ApiResponse<TaskResponseDto>> UpdateTask(int id, UpdateTaskDto updateTask)
+        {
+            var existingTask = await _dbContext.Tasks.FindAsync(id);
+            if (existingTask == null)
+            {
+                return new ApiResponse<TaskResponseDto>
+                {
+                    Message = "Task is not found",
+                    Success=false,
+                }
+                ;
+            }
+
+            _mapper.Map(updateTask, existingTask);
+
+            await _dbContext.SaveChangesAsync();
+
+            var result = _mapper.Map<TaskResponseDto>(existingTask);
+            return new ApiResponse<TaskResponseDto>
+            {
+                Success = true,
+                Message = "Update sucessfully",
+                Data = result
+            };
         }
     }
 }
