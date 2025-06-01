@@ -96,5 +96,25 @@ namespace TaskManagementAPI.Controllers
             return Ok(response);
 
         }
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ApiResponse<TaskResponseDto>>> UpdateTaskById(int id, [FromBody] UpdateTaskDto updateTaskDto)
+        {
+            if (id == 0)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Task ID mismatch"
+                });
+            }
+
+            var response = await _taskService.UpdateTask(id, updateTaskDto);
+
+            if (!response.Success)
+                return NotFound(response);
+
+            return Ok(response);
+        }
+
     }
 }
